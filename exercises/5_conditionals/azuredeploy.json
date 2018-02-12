@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "your_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "servicePlanName": {
+      "minLength": 1,
+      "type": "string",
+      "defaultValue": "demoarm-<your_name>"
+    },
+    "deployInsights": {
+      "type": "string",
+      "allowedValues": [
+        "yes","no"
+      ],
+      "defaultValue": "yes"
+    }
+  },
+  "variables": {
+    "site_name": "[concat('demoarm','-',parameters('your_name'), '-conditional3')]",
+    "servicePlanName": "[replace(parameters('servicePlanName'), '<your_name>', parameters('your_name'))]",
+    "servicePlanId": "[resourceId('Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
+  },
+  "resources": [
+    {
+      "condition": "[equals(parameters('deployInsights'),'yes')]",
+      "name": "[concat(variables('site_name'), '-yes')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "apiVersion": "2014-04-01",
+      "location": "westeurope",
+      "tags": {
+      },
+      "properties": {
+        "ApplicationId": "[concat(variables('site_name'), '-yes')]"
+      },
+      "dependsOn": []
+    },
+    {
+      "condition": "[equals(parameters('deployInsights'),'no')]",
+      "name": "[concat(variables('site_name'), '-no')]",
+      "type": "Microsoft.Insights/components",
+      "kind": "web",
+      "apiVersion": "2014-04-01",
+      "location": "westeurope",
+      "tags": {
+      },
+      "properties": {
+        "ApplicationId": "[concat(variables('site_name'), '-no')]"
+      },
+      "dependsOn": []
+    },
+    {
+      "name": "[variables('site_name')]",
+      "type": "Microsoft.Web/sites",
+      "kind": "app",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+      },
+      "properties": {},
+      "resources": [],
+      "dependsOn": [
+        "[if(equals(parameters('deployInsights'),'yes'),resourceId('Microsoft.Insights/components', concat(variables('site_name'), '-yes')), resourceId('Microsoft.Insights/components', concat(variables('site_name'), '-no')))]"
+      ]
+    }
+  ]
+}
