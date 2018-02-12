@@ -15,7 +15,6 @@
   "variables": {
     "site_name": "[concat('demoarm','-',parameters('your_name'))]",
     "slot_name": "deploy",
-    "api_site_slot": "[concat(variables('site_name'),'/',variables('slot_name'))]",
     "servicePlanName": "[replace(parameters('servicePlanName'), '<your_name>', parameters('your_name'))]",
     "servicePlanId": "[resourceId('Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
   },
