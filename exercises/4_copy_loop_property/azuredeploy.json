@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "your_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "servicePlanName": {
+      "minLength": 1,
+      "type": "string",
+      "defaultValue": "demoarm-<your_name>"
+    },
+    "country": {
+      "type": "array",
+      "defaultValue": [
+        "es",
+        "at",
+        "dk"
+      ]
+    }
+  },
+  "variables": {
+    "site_name": "[concat('demoarm','-',parameters('your_name'), '-copy')]",
+    "servicePlanName": "[replace(parameters('servicePlanName'), '<your_name>', parameters('your_name'))]",
+    "servicePlanId": "[resourceId('Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('site_name')]",
+      "type": "Microsoft.Web/sites",
+      "kind": "app",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+      },
+      "properties": {
+        "name": "[variables('site_name')]",
+        "serverFarmId": "[variables('servicePlanId')]",
+        "siteConfig": {
+          "alwaysOn": true,
+          "cors": { "allowedOrigins": [ "*" ] },
+          "copy": [{
+            "name": "appSettings",
+            "count": "[length(parameters('country'))]",
+            "input": {
+              "name": "[concat('country', copyIndex('appSettings'))]",
+              "value": "[copyIndex('appSettings')]"
+            }
+          }]
+        }
+      },
+      "resources": [],
+      "dependsOn": []
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "your_name": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "servicePlanName": {
+      "minLength": 1,
+      "type": "string",
+      "defaultValue": "demoarm-<your_name>"
+    },
+    "country": {
+      "type": "array",
+      "defaultValue": [
+        "es",
+        "at",
+        "dk"
+      ]
+    }
+  },
+  "variables": {
+    "site_name": "[concat('demoarm','-',parameters('your_name'), '-copy')]",
+    "servicePlanName": "[replace(parameters('servicePlanName'), '<your_name>', parameters('your_name'))]",
+    "servicePlanId": "[resourceId('Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
+  },
+  "resources": [
+    {
+      "copy": {
+        "name": "webs",
+        "count": "[length(parameters('country'))]"
+      },
+      "name": "[concat(variables('site_name'), '-', parameters('country')[copyIndex('webs')])]",
+      "type": "Microsoft.Web/sites",
+      "kind": "app",
+      "apiVersion": "2015-08-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+      },
+      "properties": {
+        "name": "[concat(variables('site_name'), '-', parameters('country')[copyIndex('webs')])]",
+        "serverFarmId": "[variables('servicePlanId')]"
+      },
+      "resources": [
+        {
+          "copy": {
+            "name": "slots",
+            "count": "[length(parameters('country'))]"
+          },
+          "apiVersion": "2015-08-01",
+          "name": "[concat(variables('slot_name'), '-', parameters('country')[copyIndex('slots')])]",
+          "type": "slots",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites/', concat(variables('site_name'), '-', parameters('country')[copyIndex('webs')]))]"
+          ],
+          "Properties": {}
+        }
+      ],
+      "dependsOn": []
+    }
+  ]
+}
