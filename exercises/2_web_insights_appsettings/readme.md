@@ -1,0 +1,3 @@
+Deploys a service plan, a web app, application insights and configures website always-on and appsettings.
+
+.\Deploy-AzureResourceGroup.ps1 -StorageAccountName '' -ResourceGroupName 'DemoARM' -ResourceGroupLocation 'westeurope' -TemplateFile '2_web_insights_appsettings/azuredeploy.json' -TemplateParametersFile '2_web_insights_appsettings/azuredeploy.parameters.json' -ArtifactStagingDirectory '.' -DSCSourceFolder '.\DSC'
