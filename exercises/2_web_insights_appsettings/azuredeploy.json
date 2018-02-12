@@ -17,7 +17,7 @@
     "slot_name": "deploy",
     "api_site_slot": "[concat(variables('site_name'),'/',variables('slot_name'))]",
     "servicePlanName": "[replace(parameters('servicePlanName'), '<your_name>', parameters('your_name'))]",
-    "servicePlanId": "[concat(subscription().id,'/resourceGroups/',resourcegroup().id,'/providers/Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
+    "servicePlanId": "[resourceId('Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
   },
   "resources": [
     {
