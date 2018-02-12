@@ -5,27 +5,21 @@
     "your_name": {
       "minLength": 1,
       "type": "string"
+    },
+    "servicePlanName": {
+      "minLength": 1,
+      "type": "string",
+      "defaultValue": "demoarm-<your_name>"
     }
   },
   "variables": {
     "site_name": "[concat('demoarm','-',parameters('your_name'))]",
     "slot_name": "deploy",
     "api_site_slot": "[concat(variables('site_name'),'/',variables('slot_name'))]",
+    "servicePlanName": "[replace(parameters('servicePlanName'), '<your_name>', parameters('your_name'))]",
+    "servicePlanId": "[concat(subscription().id,'/resourceGroups/',resourcegroup().id,'/providers/Microsoft.Web/serverfarms/', variables('servicePlanName'))]"
   },
   "resources": [
-    {
-      "apiVersion": "2016-09-01",
-      "name": "[variables('site_name')]",
-      "type": "Microsoft.Web/serverfarms",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "name": "[variables('site_name')]"
-      },
-      "sku": {
-        "Tier": "Standard",
-        "Name": "S1"
-      }
-    },
     {
       "name": "[variables('site_name')]",
       "type": "Microsoft.Insights/components",
@@ -49,7 +43,7 @@
       },
       "properties": {
         "name": "[variables('site_name')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('site_name'))]",
+        "serverFarmId": "[variables('servicePlanId')]",
         "siteConfig": {
           "alwaysOn": true,
           "appSettings": [
