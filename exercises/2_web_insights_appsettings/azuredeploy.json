@@ -70,7 +70,18 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/Sites/', variables('site_name'))]"
           ],
-          "Properties": {}
+          "Properties": {
+            "siteConfig": {
+              "alwaysOn": true,
+              "appSettings": [
+                {
+                  "name": "ApplicationInsights:InstrumentationKey",
+                  "value": "[reference(resourceId('Microsoft.Insights/components/', variables('site_name'))).InstrumentationKey]"
+                }
+              ],
+              "cors": { "allowedOrigins": [ "*" ] }
+            }
+          }
         }
       ],
       "dependsOn": [
